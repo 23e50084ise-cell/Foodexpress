@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Registro – FoodExpress{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+    <div class="auth-visual">
+        <div class="auth-visual-inner">
+            <div class="food-emoji-grid">
+                <span>🛵</span><span>🏪</span><span>👤</span>
+                <span>🌮</span><span>🍔</span><span>🌯</span>
+                <span>📦</span><span>⭐</span><span>💳</span>
+            </div>
+            <h2>Únete a la comunidad.</h2>
+            <p>Vende, compra o reparte. Tú decides.</p>
+        </div>
+    </div>
+
+    <div class="auth-form-wrap">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <span>🍔</span>
+                <h1>FoodExpress</h1>
+            </div>
+            <h2 class="auth-title">Crea tu cuenta</h2>
+            <p class="auth-sub">Es gratis y toma menos de un minuto</p>
+
+            <form method="POST" action="{{ url_for('registro') }}" class="auth-form">
+                <div class="form-group">
+                    <label for="nombre">Nombre completo</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="correo">Correo electrónico</label>
+                    <input type="email" id="correo" name="correo" placeholder="tu@correo.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>Tipo de cuenta</label>
+                    <div class="role-selector">
+                        <label class="role-option">
+                            <input type="radio" name="tipo" value="cliente" checked>
+                            <div class="role-card">
+                                <span class="role-icon">👤</span>
+                                <span class="role-name">Cliente</span>
+                                <span class="role-desc">Quiero pedir comida</span>
+                            </div>
+                        </label>
+                        <label class="role-option">
+                            <input type="radio" name="tipo" value="vendedor">
+                            <div class="role-card">
+                                <span class="role-icon">🏪</span>
+                                <span class="role-name">Vendedor</span>
+                                <span class="role-desc">Tengo un puesto</span>
+                            </div>
+                        </label>
+                        <label class="role-option">
+                            <input type="radio" name="tipo" value="repartidor">
+                            <div class="role-card">
+                                <span class="role-icon">🛵</span>
+                                <span class="role-name">Repartidor</span>
+                                <span class="role-desc">Quiero repartir</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary btn-full">Crear cuenta →</button>
+            </form>
+
+            <p class="auth-switch">¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia sesión</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Explorar – FoodExpress{% endblock %}
+{% block content %}
+<div class="page-hero">
+    <div class="hero-content">
+        <h1>Hola, {{ session.user_nombre.split()[0] }} 👋</h1>
+        <p>¿Qué se te antoja hoy?</p>
+    </div>
+    <div class="hero-search">
+        <input type="text" id="searchInput" placeholder="Buscar puestos o comida..." oninput="filtrarPuestos()">
+    </div>
+</div>
+
+<div class="section-header">
+    <h2>Puestos disponibles</h2>
+    <span class="count-badge">{{ puestos|length }} abiertos</span>
+</div>
+
+{% if puestos %}
+<div class="puestos-grid" id="puestosGrid">
+    {% for puesto in puestos %}
+    <a href="{{ url_for('cliente_menu', puesto_id=puesto.id) }}" class="puesto-card" data-nombre="{{ puesto.nombre|lower }}">
+        <div class="puesto-img-wrap">
+            {% if puesto.imagen %}
+                <img src="{{ url_for('static', filename='uploads/' + puesto.imagen) }}" alt="{{ puesto.nombre }}" class="puesto-img">
+            {% else %}
+                <div class="puesto-img-placeholder">🍽️</div>
+            {% endif %}
+            <div class="puesto-badge">{{ puesto.num_productos }} productos</div>
+        </div>
+        <div class="puesto-info">
+            <h3 class="puesto-nombre">{{ puesto.nombre }}</h3>
+            <p class="puesto-desc">{{ puesto.descripcion or 'Deliciosa comida local' }}</p>
+            <div class="puesto-meta">
+                <span class="puesto-vendedor">🏪 {{ puesto.vendedor_nombre }}</span>
+                <span class="puesto-cta">Ver menú →</span>
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <span class="empty-icon">🍽️</span>
+    <h3>Sin puestos disponibles</h3>
+    <p>Pronto habrá más opciones. ¡Vuelve más tarde!</p>
+</div>
+{% endif %}
+
+<script>
+function filtrarPuestos() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    document.querySelectorAll('.puesto-card').forEach(card => {
+        card.style.display = card.dataset.nombre.includes(q) ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Crear Puesto – FoodExpress{% endblock %}
+{% block content %}
+<div class="page-header">
+    <a href="{{ url_for('vendedor_dashboard') }}" class="btn-back">← Panel</a>
+    <h1>Registrar mi puesto</h1>
+</div>
+<div class="form-page-wrap">
+    <div class="form-card">
+        <form method="POST" enctype="multipart/form-data" class="admin-form">
+            <div class="form-group">
+                <label>Nombre del puesto</label>
+                <input type="text" name="nombre" placeholder="Ej: Tacos El Padrino" required>
+            </div>
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea name="descripcion" rows="3" placeholder="Describe tu negocio..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Imagen del puesto</label>
+                <div class="file-upload-wrap">
+                    <input type="file" name="imagen" accept="image/*" id="imgInput" onchange="previewImg(this)">
+                    <label for="imgInput" class="file-upload-label">
+                        <span id="fileLabel">📷 Seleccionar imagen</span>
+                    </label>
+                    <img id="imgPreview" class="img-preview hidden">
+                </div>
+            </div>
+            <button type="submit" class="btn-primary btn-full">Crear puesto →</button>
+        </form>
+    </div>
+</div>
+<script>
+function previewImg(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = document.getElementById('imgPreview');
+            img.src = e.target.result;
+            img.classList.remove('hidden');
+            document.getElementById('fileLabel').textContent = '✅ ' + input.files[0].name;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
+{% endblock %}

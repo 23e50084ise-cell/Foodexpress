@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Pedido #{{ pedido.id }} – FoodExpress{% endblock %}
+{% block content %}
+<div class="page-header">
+    <a href="{{ url_for('cliente_pedidos') }}" class="btn-back">← Mis pedidos</a>
+    <h1>Pedido #{{ pedido.id }}</h1>
+</div>
+
+<div class="detalle-layout">
+    <div class="detalle-main">
+        <div class="detalle-card">
+            <h2>Productos</h2>
+            {% for d in detalles %}
+            <div class="detalle-item-row">
+                {% if d.imagen %}
+                <img src="{{ url_for('static', filename='uploads/' + d.imagen) }}" alt="{{ d.nombre }}" class="di-img">
+                {% else %}
+                <div class="di-img di-img-ph">🍽️</div>
+                {% endif %}
+                <div class="di-info">
+                    <span class="di-nombre">{{ d.nombre }}</span>
+                    <span class="di-cant">× {{ d.cantidad }}</span>
+                </div>
+                <span class="di-subtotal">${{ "%.2f"|format(d.precio_unitario * d.cantidad) }}</span>
+            </div>
+            {% endfor %}
+            <div class="detalle-total-row">
+                <span>Total del pedido</span>
+                <strong>${{ "%.2f"|format(pedido.total) }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="detalle-sidebar">
+        <div class="detalle-card">
+            <h2>Estado del pedido</h2>
+            <div class="estado-tracker">
+                {% set estados = ['pendiente', 'aceptado', 'en_camino', 'entregado'] %}
+                {% set labels = {'pendiente': '⏳ Pendiente', 'aceptado': '✅ Aceptado', 'en_camino': '🛵 En camino', 'entregado': '🎉 Entregado'} %}
+                {% for e in estados %}
+                <div class="tracker-step {% if pedido.estado == e %}active{% elif estados.index(e) < estados.index(pedido.estado) %}done{% endif %}">
+                    {{ labels[e] }}
+                </div>
+                {% endfor %}
+                {% if pedido.estado == 'cancelado' %}
+                <div class="tracker-step cancelled">❌ Cancelado</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="detalle-card">
+            <h2>Información</h2>
+            <div class="info-rows">
+                <div class="info-row"><span>Puesto</span><strong>{{ pedido.puesto_nombre }}</strong></div>
+                <div class="info-row"><span>Dirección</span><strong>{{ pedido.direccion_entrega }}</strong></div>
+                <div class="info-row"><span>Repartidor</span><strong>{{ pedido.repartidor_nombre or 'Por asignar' }}</strong></div>
+                <div class="info-row"><span>Fecha</span><strong>{{ pedido.fecha_pedido.strftime('%d/%m/%Y %H:%M') }}</strong></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

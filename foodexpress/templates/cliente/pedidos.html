@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Mis Pedidos – FoodExpress{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>📦 Mis pedidos</h1>
+    <a href="{{ url_for('cliente_inicio') }}" class="btn-secondary">Explorar puestos</a>
+</div>
+
+{% if pedidos %}
+<div class="pedidos-list">
+    {% for pedido in pedidos %}
+    <a href="{{ url_for('cliente_detalle_pedido', pedido_id=pedido.id) }}" class="pedido-row-card">
+        <div class="prc-left">
+            <div class="prc-id">#{{ pedido.id }}</div>
+            <div class="prc-info">
+                <h3>{{ pedido.puesto_nombre }}</h3>
+                <p>{{ pedido.fecha_pedido.strftime('%d/%m/%Y %H:%M') }}</p>
+                {% if pedido.repartidor_nombre %}
+                <p class="prc-repartidor">🛵 {{ pedido.repartidor_nombre }}</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="prc-right">
+            <span class="estado-badge estado-{{ pedido.estado }}">
+                {% if pedido.estado == 'pendiente' %}⏳ Pendiente
+                {% elif pedido.estado == 'aceptado' %}✅ Aceptado
+                {% elif pedido.estado == 'en_camino' %}🛵 En camino
+                {% elif pedido.estado == 'entregado' %}🎉 Entregado
+                {% else %}❌ Cancelado{% endif %}
+            </span>
+            <div class="prc-total">${{ "%.2f"|format(pedido.total) }}</div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state large">
+    <span class="empty-icon">📦</span>
+    <h2>No tienes pedidos aún</h2>
+    <p>¡Haz tu primer pedido y aparecerá aquí!</p>
+    <a href="{{ url_for('cliente_inicio') }}" class="btn-primary">Hacer pedido</a>
+</div>
+{% endif %}
+{% endblock %}

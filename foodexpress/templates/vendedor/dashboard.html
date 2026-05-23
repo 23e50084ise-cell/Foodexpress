@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Panel Vendedor – FoodExpress{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>🏪 Mi panel</h1>
+</div>
+
+{% if not puesto %}
+<div class="empty-state large">
+    <span class="empty-icon">🏪</span>
+    <h2>Aún no tienes un puesto</h2>
+    <p>Registra tu negocio para empezar a recibir pedidos.</p>
+    <a href="{{ url_for('vendedor_crear_puesto') }}" class="btn-primary">Crear mi puesto</a>
+</div>
+
+{% else %}
+<div class="vendedor-layout">
+
+    <!-- Info del puesto -->
+    <div class="puesto-panel-card">
+        <div class="pp-img-wrap">
+            {% if puesto.imagen %}
+            <img src="{{ url_for('static', filename='uploads/' + puesto.imagen) }}" alt="{{ puesto.nombre }}">
+            {% else %}
+            <div class="pp-img-ph">🏪</div>
+            {% endif %}
+        </div>
+        <div class="pp-info">
+            <h2>{{ puesto.nombre }}</h2>
+            <p>{{ puesto.descripcion }}</p>
+            <div class="pp-stats">
+                <span>{{ productos|length }} productos</span>
+                <span>{{ pedidos|length }} pedidos recientes</span>
+            </div>
+        </div>
+        <a href="{{ url_for('vendedor_editar_puesto') }}" class="btn-secondary btn-small pp-edit">Editar puesto</a>
+    </div>
+
+    <!-- Productos -->
+    <div class="vendedor-section">
+        <div class="section-header">
+            <h2>Mis productos</h2>
+            <a href="{{ url_for('vendedor_agregar_producto') }}" class="btn-primary btn-small">+ Agregar producto</a>
+        </div>
+
+        {% if productos %}
+        <div class="productos-admin-grid">
+            {% for p in productos %}
+            <div class="prod-admin-card {% if not p.disponible %}inactivo{% endif %}">
+                <div class="pac-img">
+                    {% if p.imagen %}
+                    <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" alt="{{ p.nombre }}">
+                    {% else %}
+                    <div class="pac-img-ph">🍽️</div>
+                    {% endif %}
+                    {% if not p.disponible %}<span class="inactivo-tag">No disponible</span>{% endif %}
+                </div>
+                <div class="pac-info">
+                    <h3>{{ p.nombre }}</h3>
+                    <p>{{ p.descripcion }}</p>
+                    <strong class="pac-precio">${{ "%.2f"|format(p.precio) }}</strong>
+                </div>
+                <div class="pac-actions">
+                    <a href="{{ url_for('vendedor_editar_producto', producto_id=p.id) }}" class="btn-secondary btn-xs">Editar</a>
+                    <a href="{{ url_for('vendedor_eliminar_producto', producto_id=p.id) }}"
+                       class="btn-danger btn-xs"
+                       onclick="return confirm('¿Eliminar este producto?')">Eliminar</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <span>📦</span>
+            <p>No tienes productos. <a href="{{ url_for('vendedor_agregar_producto') }}">Agrega el primero</a>.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Pedidos recientes -->
+    <div class="vendedor-section">
+        <div class="section-header">
+            <h2>Pedidos recientes</h2>
+        </div>
+        {% if pedidos %}
+        <div class="pedidos-tabla">
+            <div class="pt-header">
+                <span>#</span><span>Cliente</span><span>Total</span><span>Estado</span><span>Fecha</span>
+            </div>
+            {% for ped in pedidos %}
+            <div class="pt-row">
+                <span>#{{ ped.id }}</span>
+                <span>{{ ped.cliente_nombre }}</span>
+                <span>${{ "%.2f"|format(ped.total) }}</span>
+                <span><span class="estado-badge estado-{{ ped.estado }}">{{ ped.estado.replace('_',' ').title() }}</span></span>
+                <span>{{ ped.fecha_pedido.strftime('%d/%m %H:%M') }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <span>📋</span>
+            <p>Aún no has recibido pedidos.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}Panel Repartidor – FoodExpress{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>🛵 Panel del repartidor</h1>
+</div>
+
+<div class="rep-tabs">
+    <button class="rep-tab active" onclick="showTab('disponibles')">
+        Disponibles
+        {% if disponibles %}<span class="tab-badge">{{ disponibles|length }}</span>{% endif %}
+    </button>
+    <button class="rep-tab" onclick="showTab('activos')">
+        Mis entregas
+        {% if mis_pedidos %}<span class="tab-badge">{{ mis_pedidos|length }}</span>{% endif %}
+    </button>
+    <button class="rep-tab" onclick="showTab('historial')">Historial</button>
+</div>
+
+<!-- DISPONIBLES -->
+<div id="tab-disponibles" class="rep-tab-content active">
+    {% if disponibles %}
+    <div class="pedidos-list">
+        {% for ped in disponibles %}
+        <div class="rep-pedido-card disponible">
+            <div class="rpc-header">
+                <span class="rpc-id">#{{ ped.id }}</span>
+                <span class="rpc-time">{{ ped.fecha_pedido.strftime('%H:%M') }}</span>
+            </div>
+            <div class="rpc-body">
+                <div class="rpc-info">
+                    <p><strong>🏪</strong> {{ ped.puesto_nombre }}</p>
+                    <p><strong>👤</strong> {{ ped.cliente_nombre }}</p>
+                    <p><strong>📍</strong> {{ ped.direccion_entrega }}</p>
+                </div>
+                <div class="rpc-footer">
+                    <span class="rpc-total">${{ "%.2f"|format(ped.total) }}</span>
+                    <a href="{{ url_for('repartidor_aceptar', pedido_id=ped.id) }}" class="btn-primary btn-small">
+                        Aceptar entrega
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <span class="empty-icon">✅</span>
+        <h3>Sin pedidos disponibles</h3>
+        <p>Espera nuevas órdenes. Se actualizan en tiempo real.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- MIS PEDIDOS ACTIVOS -->
+<div id="tab-activos" class="rep-tab-content">
+    {% if mis_pedidos %}
+    <div class="pedidos-list">
+        {% for ped in mis_pedidos %}
+        <div class="rep-pedido-card activo">
+            <div class="rpc-header">
+                <span class="rpc-id">#{{ ped.id }}</span>
+                <span class="estado-badge estado-{{ ped.estado }}">
+                    {{ ped.estado.replace('_',' ').title() }}
+                </span>
+            </div>
+            <div class="rpc-body">
+                <div class="rpc-info">
+                    <p><strong>🏪</strong> {{ ped.puesto_nombre }}</p>
+                    <p><strong>👤</strong> {{ ped.cliente_nombre }}</p>
+                    <p><strong>📍</strong> {{ ped.direccion_entrega }}</p>
+                </div>
+                <div class="rpc-footer">
+                    <span class="rpc-total">${{ "%.2f"|format(ped.total) }}</span>
+                    <div class="estado-btns">
+                        {% if ped.estado == 'aceptado' %}
+                        <a href="{{ url_for('repartidor_cambiar_estado', pedido_id=ped.id, estado='en_camino') }}" class="btn-secondary btn-small">🛵 En camino</a>
+                        {% elif ped.estado == 'en_camino' %}
+                        <a href="{{ url_for('repartidor_cambiar_estado', pedido_id=ped.id, estado='entregado') }}" class="btn-primary btn-small">✅ Entregado</a>
+                        {% endif %}
+                        <a href="{{ url_for('repartidor_cambiar_estado', pedido_id=ped.id, estado='cancelado') }}"
+                           class="btn-danger btn-small btn-xs"
+                           onclick="return confirm('¿Cancelar este pedido?')">Cancelar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <span class="empty-icon">📦</span>
+        <h3>No tienes entregas activas</h3>
+        <p>Acepta pedidos de la pestaña "Disponibles".</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- HISTORIAL -->
+<div id="tab-historial" class="rep-tab-content">
+    {% if historial %}
+    <div class="pedidos-list">
+        {% for ped in historial %}
+        <div class="rep-pedido-card historial">
+            <div class="rpc-header">
+                <span class="rpc-id">#{{ ped.id }}</span>
+                <span class="estado-badge estado-{{ ped.estado }}">
+                    {{ ped.estado.replace('_',' ').title() }}
+                </span>
+                <span class="rpc-time">{{ ped.fecha_pedido.strftime('%d/%m %H:%M') }}</span>
+            </div>
+            <div class="rpc-body">
+                <div class="rpc-info">
+                    <p>🏪 {{ ped.puesto_nombre }} → 👤 {{ ped.cliente_nombre }}</p>
+                    <p>📍 {{ ped.direccion_entrega }}</p>
+                </div>
+                <span class="rpc-total">${{ "%.2f"|format(ped.total) }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <span>📋</span>
+        <p>Tu historial de entregas aparecerá aquí.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function showTab(name) {
+    document.querySelectorAll('.rep-tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.rep-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    event.target.classList.add('active');
+}
+// Auto-refresh every 30 seconds
+setTimeout(() => location.reload(), 30000);
+</script>
+{% endblock %}

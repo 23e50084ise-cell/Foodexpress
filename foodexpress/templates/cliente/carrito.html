@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Carrito – FoodExpress{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>🛒 Tu carrito</h1>
+</div>
+
+{% if carrito %}
+<div class="carrito-layout">
+    <div class="carrito-items-list">
+        {% for item in carrito %}
+        <div class="carrito-item-row">
+            <div class="ci-img">
+                {% if item.imagen %}
+                <img src="{{ url_for('static', filename='uploads/' + item.imagen) }}" alt="{{ item.nombre }}">
+                {% else %}
+                <div class="ci-img-ph">🍽️</div>
+                {% endif %}
+            </div>
+            <div class="ci-info">
+                <h3>{{ item.nombre }}</h3>
+                <p class="ci-puesto">{{ item.puesto_nombre }}</p>
+                <p class="ci-precio">${{ "%.2f"|format(item.precio) }} × {{ item.cantidad }}</p>
+            </div>
+            <div class="ci-subtotal">
+                ${{ "%.2f"|format(item.precio * item.cantidad) }}
+            </div>
+            <a href="{{ url_for('eliminar_carrito', producto_id=item.producto_id) }}" class="ci-remove">✕</a>
+        </div>
+        {% endfor %}
+
+        <div class="carrito-actions-row">
+            <a href="{{ url_for('vaciar_carrito') }}" class="btn-secondary btn-small">Vaciar carrito</a>
+            <a href="{{ url_for('cliente_inicio') }}" class="btn-secondary btn-small">+ Agregar más</a>
+        </div>
+    </div>
+
+    <div class="carrito-resumen">
+        <div class="resumen-card">
+            <h2>Resumen del pedido</h2>
+            <div class="resumen-rows">
+                {% for item in carrito %}
+                <div class="resumen-row">
+                    <span>{{ item.nombre }} ×{{ item.cantidad }}</span>
+                    <span>${{ "%.2f"|format(item.precio * item.cantidad) }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="resumen-total-row">
+                <span>Total</span>
+                <span class="resumen-total">${{ "%.2f"|format(total) }}</span>
+            </div>
+
+            <form method="POST" action="{{ url_for('confirmar_pedido') }}" class="pedido-form">
+                <div class="form-group">
+                    <label for="direccion">📍 Dirección de entrega</label>
+                    <input type="text" id="direccion" name="direccion" placeholder="Calle, número, colonia..." required>
+                </div>
+                <button type="submit" class="btn-primary btn-full btn-large">
+                    Confirmar pedido · ${{ "%.2f"|format(total) }}
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<div class="empty-state large">
+    <span class="empty-icon">🛒</span>
+    <h2>Tu carrito está vacío</h2>
+    <p>Explora los puestos y agrega tus platillos favoritos.</p>
+    <a href="{{ url_for('cliente_inicio') }}" class="btn-primary">Explorar puestos</a>
+</div>
+{% endif %}
+{% endblock %}

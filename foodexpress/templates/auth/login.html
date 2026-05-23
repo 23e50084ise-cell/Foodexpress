@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Iniciar Sesión – FoodExpress{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+    <div class="auth-visual">
+        <div class="auth-visual-inner">
+            <div class="food-emoji-grid">
+                <span>🌮</span><span>🍔</span><span>🌯</span>
+                <span>🍕</span><span>🥙</span><span>🍜</span>
+                <span>🥗</span><span>🍣</span><span>🌭</span>
+            </div>
+            <h2>Tu comida favorita, en minutos.</h2>
+            <p>Puestos locales. Sabor auténtico.</p>
+        </div>
+    </div>
+
+    <div class="auth-form-wrap">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <span>🍔</span>
+                <h1>FoodExpress</h1>
+            </div>
+            <h2 class="auth-title">Bienvenido de vuelta</h2>
+            <p class="auth-sub">Inicia sesión para continuar</p>
+
+            <form method="POST" action="{{ url_for('login') }}" class="auth-form">
+                <div class="form-group">
+                    <label for="correo">Correo electrónico</label>
+                    <input type="email" id="correo" name="correo" placeholder="tu@correo.com" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary btn-full">Iniciar sesión →</button>
+            </form>
+
+            <p class="auth-switch">¿No tienes cuenta? <a href="{{ url_for('registro') }}">Regístrate aquí</a></p>
+
+        </div>
+    </div>
+</div>
+
+<script>
+function fillLogin(correo) {
+    document.getElementById('correo').value = correo;
+    document.getElementById('password').value = '123456';
+}
+</script>
+{% endblock %}

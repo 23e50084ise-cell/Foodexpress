@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FoodExpress Market{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if session.user_id %}
+<nav class="navbar">
+    <a href="{{ url_for('index') }}" class="nav-brand">
+        <span class="brand-icon">🍔</span>
+        <span class="brand-text">FoodExpress</span>
+    </a>
+    <div class="nav-links">
+        {% if session.user_tipo == 'cliente' %}
+            <a href="{{ url_for('cliente_inicio') }}" class="nav-link">Explorar</a>
+            <a href="{{ url_for('ver_carrito') }}" class="nav-link nav-cart">
+                🛒
+                {% if session.carrito %}
+                <span class="cart-badge">{{ session.carrito|length }}</span>
+                {% endif %}
+            </a>
+            <a href="{{ url_for('cliente_pedidos') }}" class="nav-link">Mis pedidos</a>
+        {% elif session.user_tipo == 'vendedor' %}
+            <a href="{{ url_for('vendedor_dashboard') }}" class="nav-link">Mi panel</a>
+            <a href="{{ url_for('vendedor_agregar_producto') }}" class="nav-link">+ Producto</a>
+        {% elif session.user_tipo == 'repartidor' %}
+            <a href="{{ url_for('repartidor_dashboard') }}" class="nav-link">Panel</a>
+        {% endif %}
+        <div class="nav-user">
+            <span class="user-name">{{ session.user_nombre.split()[0] }}</span>
+            <span class="user-badge {{ session.user_tipo }}">{{ session.user_tipo }}</span>
+        </div>
+        <a href="{{ url_for('logout') }}" class="btn-logout">Salir</a>
+    </div>
+</nav>
+{% endif %}
+
+<main class="main-content {% if not session.user_id %}no-nav{% endif %}">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alerts-container">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    <span>{{ message }}</span>
+                    <button onclick="this.parentElement.remove()">✕</button>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

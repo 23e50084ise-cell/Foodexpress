@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}{{ puesto.nombre }} – FoodExpress{% endblock %}
+{% block content %}
+<div class="menu-header">
+    <a href="{{ url_for('cliente_inicio') }}" class="btn-back">← Volver</a>
+    {% if puesto.imagen %}
+    <div class="menu-hero-img">
+        <img src="{{ url_for('static', filename='uploads/' + puesto.imagen) }}" alt="{{ puesto.nombre }}">
+        <div class="menu-hero-overlay"></div>
+    </div>
+    {% endif %}
+    <div class="menu-puesto-info">
+        <h1>{{ puesto.nombre }}</h1>
+        <p>{{ puesto.descripcion }}</p>
+        <span class="meta-chip">🏪 {{ puesto.vendedor_nombre }}</span>
+    </div>
+</div>
+
+<div class="menu-container">
+    <div class="menu-list">
+        <h2 class="menu-section-title">Menú</h2>
+        {% if productos %}
+        <div class="productos-grid">
+            {% for producto in productos %}
+            <div class="producto-card">
+                <div class="producto-img-wrap">
+                    {% if producto.imagen %}
+                        <img src="{{ url_for('static', filename='uploads/' + producto.imagen) }}" alt="{{ producto.nombre }}">
+                    {% else %}
+                        <div class="producto-img-ph">🍽️</div>
+                    {% endif %}
+                </div>
+                <div class="producto-info">
+                    <h3>{{ producto.nombre }}</h3>
+                    <p>{{ producto.descripcion }}</p>
+                    <div class="producto-footer">
+                        <span class="precio">${{ "%.2f"|format(producto.precio) }}</span>
+                        <button class="btn-agregar" onclick="agregarAlCarrito({{ producto.id }})">
+                            + Agregar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <span>😕</span>
+            <p>Este puesto aún no tiene productos.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="carrito-flotante" id="carritoFlotante">
+        <div class="carrito-header">
+            <h3>🛒 Tu orden</h3>
+            <a href="{{ url_for('ver_carrito') }}" class="btn-ver-carrito">Ver carrito</a>
+        </div>
+        <div id="carritoItems" class="carrito-items">
+            <p class="carrito-empty">Agrega productos para comenzar</p>
+        </div>
+        <div class="carrito-total-row">
+            <span>Total:</span>
+            <span id="carritoTotal">$0.00</span>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+let carritoLocal = [];
+
+function agregarAlCarrito(productoId) {
+    fetch('/cliente/carrito/agregar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({producto_id: productoId})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.ok) {
+            showToast('✅ Producto agregado');
+            actualizarCarritoUI();
+        } else {
+            showToast('⚠️ ' + (data.msg || 'No se pudo agregar'), true);
+        }
+    });
+}
+
+function actualizarCarritoUI() {
+    fetch('/cliente/carrito')
+    .then(r => r.text())
+    .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        // Just reload to get fresh session data
+    });
+    // Visual feedback only - real count from server
+    const badge = document.querySelector('.cart-badge');
+    if (badge) badge.textContent = parseInt(badge.textContent || 0) + 1;
+}
+
+function showToast(msg, error=false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (error ? ' error' : '');
+    setTimeout(() => t.className = 'toast', 2500);
+}
+</script>
+{% endblock %}
